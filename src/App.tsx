@@ -11,7 +11,6 @@ import {
   theme,
   Modal,
   Badge,
-  Avatar,
   Divider,
   message,
 } from 'antd';
@@ -24,7 +23,6 @@ import {
   LinkedinOutlined,
   CheckCircleOutlined,
   ArrowRightOutlined,
-  MenuOutlined,
 } from '@ant-design/icons';
 
 const { Header, Content, Footer } = Layout;
@@ -59,7 +57,6 @@ const features: FeatureItem[] = [
 const WelcomePage: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const { token } = theme.useToken();
-  const [isMobile, setIsMobile] = useState(false); // Для упрощения примера статично, можно добавить resize listener
 
   // Обработчик действия
   const handleGetStarted = () => {
