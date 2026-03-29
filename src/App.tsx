@@ -4,10 +4,11 @@ import {
   Tabs, Button, message, Select
 } from 'antd';
 import {
-  UserOutlined, MedicineBoxOutlined, HeartOutlined,
+  UserOutlined, MedicineBoxOutlined,
   CopyOutlined, ClockCircleOutlined, ExclamationCircleOutlined
 } from '@ant-design/icons';
-import MIS from "./MIS.tsx";
+import MIS from './MIS';
+import Chat from "./Chat.tsx";
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text } = Typography;
@@ -121,7 +122,7 @@ const App: React.FC = () => {
   const [selectedType, setSelectedType] = useState<AppointmentType | 'all'>('all');
   const [activeTab, setActiveTab] = useState('chat');
   const {
-    token: { colorBgContainer, borderRadiusLG },
+    token: { colorBgContainer },
   } = theme.useToken();
 
   // Фильтрация сценариев
@@ -153,62 +154,52 @@ const App: React.FC = () => {
   };
 
   return (
-      <Layout style={{ minHeight: '100vh' }}>
-        {/* Левое меню (Сайдбар) */}
+      <Layout style={{ minHeight: '100vh', overflow: 'hidden' }}>
+        {/* Левое меню (Сайдбар) - со скроллом */}
         <Sider
             width={400}
             theme="light"
             style={{
               padding: '16px',
               height: '100vh',
-              position: 'sticky',
-              top: 0,
-              display: 'flex',
-              flexDirection: 'column'
+              overflowY: 'auto',
+              overflowX: 'hidden'
             }}
         >
-          {/* Фиксированная верхняя часть (заголовок + фильтры) */}
-          <div style={{
-            marginBottom: '16px',
-            flexShrink: 0
-          }}>
-            <div style={{ marginBottom: '24px' }}>
-              <Title level={4} style={{ margin: 0 }}>
-                <MedicineBoxOutlined /> Симуляция приема
-              </Title>
-              <Text type="secondary" style={{ fontSize: '12px' }}>Пациент</Text>
-            </div>
-
-            {/* Блок поиска */}
-            <div style={{ marginBottom: '16px' }}>
-              <Search
-                  placeholder="Поиск симптома или описания..."
-                  allowClear
-                  onChange={(e) => setSearchText(e.target.value)}
-                  style={{ width: '100%' }}
-              />
-            </div>
-
-            {/* Фильтр по типу приема */}
-            <div style={{ marginBottom: '16px' }}>
-              <Text strong style={{ display: 'block', marginBottom: '8px' }}>Тип приема:</Text>
-              <Select
-                  value={selectedType}
-                  onChange={(value) => setSelectedType(value)}
-                  options={TYPE_OPTIONS}
-                  style={{ width: '100%' }}
-              />
-            </div>
+          {/* Заголовок */}
+          <div style={{ marginBottom: '24px' }}>
+            <Title level={4} style={{ margin: 0 }}>
+              <MedicineBoxOutlined /> Симуляция приема
+            </Title>
+            <Text type="secondary" style={{ fontSize: '12px' }}>Пациент</Text>
           </div>
 
-          {/* Скроллящийся список сценариев */}
+          {/* Блок поиска */}
+          <div style={{ marginBottom: '16px' }}>
+            <Search
+                placeholder="Поиск симптома или описания..."
+                allowClear
+                onChange={(e) => setSearchText(e.target.value)}
+                style={{ width: '100%' }}
+            />
+          </div>
+
+          {/* Фильтр по типу приема */}
+          <div style={{ marginBottom: '24px' }}>
+            <Text strong style={{ display: 'block', marginBottom: '8px' }}>Тип приема:</Text>
+            <Select
+                value={selectedType}
+                onChange={(value) => setSelectedType(value)}
+                options={TYPE_OPTIONS}
+                style={{ width: '100%' }}
+            />
+          </div>
+
+          {/* Список сценариев */}
           <div style={{
-            flex: 1,
-            overflowY: 'auto',
             display: 'flex',
             flexDirection: 'column',
-            gap: '12px',
-            paddingRight: '8px'
+            gap: '12px'
           }}>
             {filteredScenarios.length > 0 ? (
                 filteredScenarios.map((scenario) => (
@@ -270,7 +261,7 @@ const App: React.FC = () => {
         </Sider>
 
         {/* Основной контент */}
-        <Layout>
+        <Layout style={{ overflow: 'hidden' }}>
           <Header
               style={{
                 padding: '0 24px',
@@ -278,7 +269,8 @@ const App: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                borderBottom: '1px solid #f0f0f0'
+                borderBottom: '1px solid #f0f0f0',
+                flexShrink: 0
               }}
           >
             <Title level={3} style={{ margin: 0 }}>Рабочее место врача</Title>
@@ -287,34 +279,21 @@ const App: React.FC = () => {
             </Space>
           </Header>
 
-          <Content style={{ margin: '24px 16px' }}>
+          <Content style={{
+            margin: '24px 16px',
+            overflow: 'auto',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
             <Tabs
                 activeKey={activeTab}
                 onChange={setActiveTab}
+                style={{ flex: 1 }}
                 items={[
                   {
                     key: 'chat',
                     label: '💬 Чат с пациентом',
-                    children: (
-                        <div
-                            style={{
-                              padding: 24,
-                              minHeight: 500,
-                              background: colorBgContainer,
-                              borderRadius: borderRadiusLG,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              border: '2px dashed #d9d9d9'
-                            }}
-                        >
-                          <div style={{ textAlign: 'center', color: '#999' }}>
-                            <HeartOutlined style={{ fontSize: '48px', marginBottom: '16px', display: 'block' }} />
-                            <Title level={4}>Чат с пациентом</Title>
-                            <Text>Здесь будет отображаться диалог с пациентом в реальном времени.</Text>
-                          </div>
-                        </div>
-                    )
+                    children: <Chat />
                   },
                   {
                     key: 'mis',
